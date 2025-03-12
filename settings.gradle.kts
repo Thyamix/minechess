@@ -1,2 +1,2 @@
-rootProject.name = "minestom-chess"
+rootProject.name = "minechess"
 
