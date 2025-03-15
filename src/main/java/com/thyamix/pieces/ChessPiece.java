@@ -7,6 +7,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.block.Block;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public abstract class ChessPiece {
     public boolean isSelected = false;
     public int[] position;
     public boolean isWhite;
-    public List<int[]> possibleMoves;
+    public List<int[]> possibleMoves = new ArrayList<int[]>();
 
     ChessPiece(Schematic schematic, ChessBoard chessBoard, boolean isWhite, int[] position) {
         this.schematic = schematic;

@@ -65,8 +65,11 @@ public class ChessBoard {
         this.chessPieces.add(new King(new SchematicReader(), this, false, new int[]{3, 7}));
     }
 
-    public boolean isEmptySquare(int[] position) {
-        return this.chessPieces.stream().anyMatch(chessPiece -> Arrays.equals(chessPiece.position, position));
+    public boolean isEmptyValidSquare(int[] position) {
+        if (position[0] < 0 || position[0] > 7 || position[1] < 0 || position[1] > 7) {
+            return false;
+        }
+        return this.chessPieces.stream().noneMatch(chessPiece -> Arrays.equals(chessPiece.position, position));
     }
 
     public void resetSquare(int x, int z) {

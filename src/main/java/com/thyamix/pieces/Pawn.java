@@ -14,15 +14,18 @@ public class Pawn extends ChessPiece {
     @Override
     public void getMoves() {
         int[] possibleMove = this.position.clone();
-        possibleMove[1]++;
-        if (this.chessBoard.isEmptySquare(possibleMove)) {
-            this.possibleMoves.add(possibleMove);
-            possibleMove[1]++;
-            if (this.chessBoard.isEmptySquare(possibleMove) && !this.hasMoved) {
-                this.possibleMoves.add(possibleMove);
-            }
+        possibleMove[1] = this.isWhite ? (possibleMove[1] + 1) : (possibleMove[1] - 1);
+        if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
+            this.possibleMoves.add(possibleMove.clone());
         } else {
             return;
         }
+        if (!this.hasMoved) {
+            possibleMove[1] = this.isWhite ? possibleMove[1] + 1 : possibleMove[1] - 1;
+            if (this.chessBoard.isEmptyValidSquare(possibleMove) && !this.hasMoved) {
+                this.possibleMoves.add(possibleMove.clone());
+            }
+        }
     }
 }
+

@@ -1,47 +1,49 @@
 package com.thyamix.game;
 
+import com.thyamix.pieces.ChessPiece;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.InstanceContainer;
 
 public class ChessGame {
 
-    public InstanceContainer instanceContainer;
-    ChessBoard chessBoard;
-    Player player1;
-    Player player2;
+    public final InstanceContainer instanceContainer;
+    private final ChessBoard chessBoard;
+    public Player player1;
+    public Player player2;
+    private boolean isWhiteTurn = true;
     public boolean running;
-    public boolean compelete;
+    public boolean complete;
 
-    public ChessGame() {
-        this.instanceContainer = GameHandler.initInstanceContainer(false);
+    public ChessGame(GameHandler gameHandler) {
+        this.instanceContainer = gameHandler.initInstanceContainer(false);
         this.chessBoard = new ChessBoard(this);
     }
 
-    public void playerJoin(Player player) {
-        if (this.running) {
-            player.sendMessage("Game already full, wait for it to finish to join.");
-            return;
-        }
-        if (this.player1 == null) {
-            this.player1 = player;
-        } else if (this.player2 == null) {
-            this.player2 = player;
-        } else {
-            return;
-        }
-
-        if (this.player1 != null && this.player2 != null) {
-            this.running = true;
-            this.start();
-        }
-    }
-
     private void start() {
-
+        player1.sendMessage("Starting...");
+        refreshMoves();
     }
+
+
+    private void refreshMoves() {
+        for (ChessPiece piece : this.chessBoard.chessPieces) {
+            piece.getMoves();
+        }
+    }
+
 
     public void join(Player player, InstanceContainer instanceContainer) {
         player.setInstance(instanceContainer);
         player.sendMessage("Joining");
+        if (this.player1 == null) {
+            this.player1 = player;
+            player.sendMessage("You are playing white.");
+            this.start();
+        } else if (this.player2 == null) {
+            this.player2 = player;
+            player.sendMessage("You are playing black.");
+
+            this.start();
+        }
     }
 }

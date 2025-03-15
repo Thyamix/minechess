@@ -14,14 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameHandler {
-    private static InstanceContainer lobby;
-    private static final List<ChessGame> chessGames = new ArrayList<ChessGame>();
+    private InstanceContainer lobby;
+    private final List<ChessGame> chessGames = new ArrayList<>();
 
-    public static InstanceContainer initInstanceContainer(Boolean isLobby) {
-        DimensionType fullbright = DimensionType.builder()
+    public InstanceContainer initInstanceContainer(Boolean isLobby) {
+        DimensionType fullBright = DimensionType.builder()
                 .ambientLight(2.0f)
                 .build();
-        DynamicRegistry.Key<DimensionType> key = MinecraftServer.getDimensionTypeRegistry().register(NamespaceID.from("minestom:full_bright"), fullbright);
+        DynamicRegistry.Key<DimensionType> key = MinecraftServer.getDimensionTypeRegistry().register(NamespaceID.from("minestom:full_bright"), fullBright);
 
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         InstanceContainer instanceContainer = instanceManager.createInstanceContainer(key);
@@ -35,29 +35,28 @@ public class GameHandler {
         return instanceContainer;
     }
 
-    public static ChessGame newGame() {
-        ChessGame chessGame = new ChessGame();
-        chessGames.add(chessGame);
+    public ChessGame newGame() {
+        ChessGame chessGame = new ChessGame(this);
+        this.chessGames.add(chessGame);
         return chessGame;
     }
 
-    public static void gameJoinRequest(Player player) {
-        for (ChessGame game : GameHandler.chessGames) {
-            if (!game.compelete && !game.running && (game.player1 == null || game.player2 == null)) {
+    public void gameJoinRequest(Player player) {
+        for (ChessGame game : this.chessGames) {
+            if (!game.complete && !game.running && (game.player1 == null || game.player2 == null)) {
                 game.join(player, game.instanceContainer);
                 return;
             }
 
         }
-        ChessGame game = new ChessGame();
-        GameHandler.chessGames.add(game);
-        game.join(player, game.instanceContainer);
+        ChessGame chessGame = this.newGame();
+        chessGame.join(player, chessGame.instanceContainer);
     }
 
-    public static InstanceContainer getLobby() {
-        if (GameHandler.lobby == null) {
-            GameHandler.lobby = GameHandler.initInstanceContainer(true);
+    public InstanceContainer getLobby() {
+        if (this.lobby == null) {
+            this.lobby = this.initInstanceContainer(true);
         }
-        return GameHandler.lobby;
+        return this.lobby;
     }
 }
