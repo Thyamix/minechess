@@ -1,16 +1,15 @@
 package com.thyamix.utility;
 
-import com.thyamix.game.ChessBoard;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 
 public class RayTraceGridSelector {
-    public Player player;
-    public ChessBoard chessBoard;
 
-    public int[] select() {
-        Pos playerPos = this.player.getPosition();
+    private static Pos playerPos;
+
+    public static PiecePosition select(Player player) {
+        Pos playerPos = player.getPosition().add(0, player.getEyeHeight(), 0);
         Vec lookingDir = playerPos.direction();
 
         if (lookingDir.y() >= 0) {
@@ -22,6 +21,6 @@ public class RayTraceGridSelector {
         double x = playerPos.x() + t * lookingDir.x();
         double z = playerPos.z() + t * lookingDir.z();
 
-        return new int[]{(int) (x/4), (int) (z/4)};
+        return new PiecePosition((int) (x / 4), (int) (z / 4));
     }
 }
