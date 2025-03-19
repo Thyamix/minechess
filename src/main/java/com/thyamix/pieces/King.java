@@ -13,6 +13,8 @@ public class King extends ChessPiece{
 
     @Override
     public void getMoves() {
+        this.clearPossibleMoves();
+        this.clearPossibleTakes();
 
     }
 }

@@ -67,10 +67,14 @@ public class ChessBoard {
     }
 
     public boolean isEmptyValidSquare(PiecePosition position) {
-        if (position.getX() < 0 || position.getX() > 7 || position.getY() < 0 || position.getY() > 7) {
-            return false;
+        if (isValidSquare(position)) {
+            return this.chessPieces.stream().noneMatch(chessPiece -> chessPiece.getPosition().equals(position));
         }
-        return this.chessPieces.stream().noneMatch(chessPiece -> chessPiece.getPosition().equals(position));
+        return false;
+    }
+
+    public boolean isValidSquare(PiecePosition position) {
+        return position.getX() >= 0 && position.getX() <= 7 && position.getY() >= 0 && position.getY() <= 7;
     }
 
     public void resetSquare(int x, int z) {

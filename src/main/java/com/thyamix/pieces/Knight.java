@@ -13,6 +13,74 @@ public class Knight extends  ChessPiece{
 
     @Override
     public void getMoves() {
+        this.clearPossibleMoves();
+        this.clearPossibleTakes();
+        PiecePosition possibleMove = this.getPosition().clone();
+        possibleMove.incX();
+        possibleMove.incX();
+        possibleMove.incY();
+        if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
+            addPossibleMoves(possibleMove.clone());
+        } else if (this.chessBoard.isValidSquare(possibleMove)) {
+            this.checkAndAddPossibleTakes(possibleMove.clone());
+        }
+        possibleMove.decY();
+        possibleMove.decY();
+        if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
+            addPossibleMoves(possibleMove.clone());
+        } else if (this.chessBoard.isValidSquare(possibleMove)) {
+            this.checkAndAddPossibleTakes(possibleMove.clone());
+        }
 
+        possibleMove = this.getPosition().clone();
+        possibleMove.decX();
+        possibleMove.decX();
+        possibleMove.incY();
+        if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
+            addPossibleMoves(possibleMove.clone());
+        } else if (this.chessBoard.isValidSquare(possibleMove)) {
+            this.checkAndAddPossibleTakes(possibleMove.clone());
+        }
+        possibleMove.decY();
+        possibleMove.decY();
+        if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
+            addPossibleMoves(possibleMove.clone());
+        } else if (this.chessBoard.isValidSquare(possibleMove)) {
+            this.checkAndAddPossibleTakes(possibleMove.clone());
+        }
+
+        possibleMove = this.getPosition().clone();
+        possibleMove.incY();
+        possibleMove.incY();
+        possibleMove.incX();
+        if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
+            addPossibleMoves(possibleMove.clone());
+        } else if (this.chessBoard.isValidSquare(possibleMove)) {
+            this.checkAndAddPossibleTakes(possibleMove.clone());
+        }
+        possibleMove.decX();
+        possibleMove.decX();
+        if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
+            addPossibleMoves(possibleMove.clone());
+        } else if (this.chessBoard.isValidSquare(possibleMove)) {
+            this.checkAndAddPossibleTakes(possibleMove.clone());
+        }
+
+        possibleMove = this.getPosition().clone();
+        possibleMove.decY();
+        possibleMove.decY();
+        possibleMove.incX();
+        if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
+            addPossibleMoves(possibleMove.clone());
+        } else if (this.chessBoard.isValidSquare(possibleMove)) {
+            this.checkAndAddPossibleTakes(possibleMove.clone());
+        }
+        possibleMove.decX();
+        possibleMove.decX();
+        if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
+            addPossibleMoves(possibleMove.clone());
+        } else if (this.chessBoard.isValidSquare(possibleMove)) {
+            this.checkAndAddPossibleTakes(possibleMove.clone());
+        }
     }
 }

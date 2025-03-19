@@ -37,4 +37,20 @@ public class PiecePosition {
     public void setY(int y) {
         this.y = y;
     }
+
+    public void incX() {
+        this.x++;
+    }
+
+    public void decX() {
+        this.x--;
+    }
+
+    public void incY() {
+        this.y++;
+    }
+
+    public void decY() {
+        this.y--;
+    }
 }

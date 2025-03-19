@@ -15,6 +15,7 @@ public class Pawn extends ChessPiece {
     @Override
     public void getMoves() {
         this.clearPossibleMoves();
+        this.clearPossibleTakes();
         PiecePosition possibleMove = this.getPosition().clone();
         possibleMove.setY(this.getIsWhite() ? (possibleMove.getY() + 1) : (possibleMove.getY() - 1));
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {

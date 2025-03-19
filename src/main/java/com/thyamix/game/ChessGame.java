@@ -74,7 +74,7 @@ public class ChessGame {
                 PiecePosition pos = RayTraceGridSelector.select(playerUseItemEvent.getPlayer());
                 Optional<ChessPiece> chessPiece = getPiece(pos);
                 if (chessPiece.isPresent()) {
-                    ChessPiece piece = chessPiece.orElseThrow();
+                    ChessPiece piece = chessPiece.get();
                     if (playerUseItemEvent.getPlayer().equals(player1) && piece.getIsWhite() && isWhiteTurn) {
                         piece.select();
                         return;
@@ -82,6 +82,9 @@ public class ChessGame {
                         piece.select();
                         return;
                     }
+                }
+                if (this.chessBoard.getSelectedPiece() == null) {
+                    return;
                 }
                 if (this.chessBoard.getSelectedPiece().getPossibleMoves().stream().anyMatch(piecePosition -> {
                     return piecePosition.equals(pos);
@@ -100,7 +103,7 @@ public class ChessGame {
 
     }
 
-    private Optional<ChessPiece> getPiece(PiecePosition pos) {
+    public Optional<ChessPiece> getPiece(PiecePosition pos) {
         return this.chessBoard.getChessPieces().stream().filter(chessPiece -> chessPiece.getPosition().equals(pos)).findAny();
     }
 }

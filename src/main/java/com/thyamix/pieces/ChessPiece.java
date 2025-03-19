@@ -20,6 +20,7 @@ public abstract class ChessPiece {
     private PiecePosition position;
     private boolean isWhite;
     private List<PiecePosition> possibleMoves = new ArrayList<>();
+    private List<PiecePosition> possibleTake = new ArrayList<>();
 
     ChessPiece(Schematic schematic, ChessBoard chessBoard, boolean isWhite, PiecePosition position) {
         this.schematic = schematic;
@@ -73,6 +74,9 @@ public abstract class ChessPiece {
         this.possibleMoves.forEach(possibleMove -> {
             this.chessBoard.setSquare(possibleMove.getX(), possibleMove.getY(), Block.GREEN_CONCRETE);
         });
+        this.possibleTake.forEach(possibleTake -> {
+            this.chessBoard.setSquare(possibleTake.getX(), possibleTake.getY(), Block.RED_CONCRETE);
+        });
     }
 
     public PiecePosition getPosition() {
@@ -104,7 +108,21 @@ public abstract class ChessPiece {
     }
 
     protected void clearPossibleMoves() {
-        this.possibleMoves = new ArrayList<PiecePosition>();
+        this.possibleMoves = new ArrayList<>();
     }
+
+    protected void checkAndAddPossibleTakes(PiecePosition possibleMove) {
+        if (this.chessBoard.getChessGame().getPiece(possibleMove).isPresent()) {
+            ChessPiece piece = this.chessBoard.getChessGame().getPiece(possibleMove).get();
+            if (this.isWhite != piece.isWhite) {
+                this.possibleTake.add(possibleMove);
+            }
+        }
+    }
+
+    protected void clearPossibleTakes() {
+        this.possibleTake = new ArrayList<>();
+    }
+
 }
 
