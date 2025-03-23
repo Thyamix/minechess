@@ -14,13 +14,12 @@ public class Rook extends ChessPiece {
 
     @Override
     public void getMoves() {
-        this.clearPossibleMoves();
-        this.clearPossibleTakes();
+        this.clearMoves();
         PiecePosition possibleMove = this.getPosition().clone();
         while (true) {
             possibleMove.incX();
             if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
-                this.addPossibleMoves(possibleMove.clone());
+                this.checkAndAddPossibleMoves(possibleMove.clone());
             } else {
                 if (this.chessBoard.isValidSquare(possibleMove)) {
                     this.checkAndAddPossibleTakes(possibleMove.clone());
@@ -32,7 +31,7 @@ public class Rook extends ChessPiece {
         while (true) {
             possibleMove.decX();
             if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
-                this.addPossibleMoves(possibleMove.clone());
+                this.checkAndAddPossibleMoves(possibleMove.clone());
             } else {
                 if (this.chessBoard.isValidSquare(possibleMove)) {
                     this.checkAndAddPossibleTakes(possibleMove.clone());
@@ -44,7 +43,7 @@ public class Rook extends ChessPiece {
         while (true){
             possibleMove.incY();
             if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
-                this.addPossibleMoves(possibleMove.clone());
+                this.checkAndAddPossibleMoves(possibleMove.clone());
             } else {
                 if (this.chessBoard.isValidSquare(possibleMove)) {
                     this.checkAndAddPossibleTakes(possibleMove.clone());
@@ -56,7 +55,7 @@ public class Rook extends ChessPiece {
         while (true){
             possibleMove.decY();
             if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
-                this.addPossibleMoves(possibleMove.clone());
+                this.checkAndAddPossibleMoves(possibleMove.clone());
             } else {
                 if (this.chessBoard.isValidSquare(possibleMove)) {
                     this.checkAndAddPossibleTakes(possibleMove.clone());

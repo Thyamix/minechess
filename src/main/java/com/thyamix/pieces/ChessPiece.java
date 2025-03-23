@@ -17,10 +17,12 @@ public abstract class ChessPiece {
     protected final ChessBoard chessBoard;
 
     private boolean hasMoved = false;
-    private PiecePosition position;
-    private boolean isWhite;
+    private final PiecePosition position;
+    private final PiecePosition testPosition;
+    private final boolean isWhite;
     private List<PiecePosition> possibleMoves = new ArrayList<>();
-    private List<PiecePosition> possibleTake = new ArrayList<>();
+    private List<PiecePosition> illegalMoves = new ArrayList<>();
+    private List<PiecePosition> possibleTakes = new ArrayList<>();
 
     ChessPiece(Schematic schematic, ChessBoard chessBoard, boolean isWhite, PiecePosition position) {
         this.schematic = schematic;
@@ -28,22 +30,17 @@ public abstract class ChessPiece {
         this.chessBoard = chessBoard;
         this.isWhite = isWhite;
         this.position = position;
+        this.testPosition = position.clone();
         this.placeBlocks();
     }
 
     public abstract void getMoves();
 
-    public boolean canMoveTo(PiecePosition move) {
-        return this.possibleMoves.stream().anyMatch(possibleMove -> possibleMove.equals(move));
-    }
-
     public void move(PiecePosition move) {
-        if (!canMoveTo(move)) {
-            return;
-        }
         clearBlocks();
 
         this.position.set(move);
+        this.testPosition.set(move);
 
         placeBlocks();
         this.unselect();
@@ -60,7 +57,7 @@ public abstract class ChessPiece {
         }));
     }
 
-    protected void clearBlocks() {
+    public void clearBlocks() {
         for (int x = 0; x < 4; x++) {
             for (int y = 0; y < 8; y++) {
                 for (int z = 0; z < 4; z++) {
@@ -71,12 +68,9 @@ public abstract class ChessPiece {
     }
 
     public void displayPossibleMoves() {
-        this.possibleMoves.forEach(possibleMove -> {
-            this.chessBoard.setSquare(possibleMove.getX(), possibleMove.getY(), Block.GREEN_CONCRETE);
-        });
-        this.possibleTake.forEach(possibleTake -> {
-            this.chessBoard.setSquare(possibleTake.getX(), possibleTake.getY(), Block.RED_CONCRETE);
-        });
+        this.possibleMoves.forEach(possibleMove -> this.chessBoard.setSquare(possibleMove.getX(), possibleMove.getY(), Block.GREEN_CONCRETE));
+        this.possibleTakes.forEach(possibleTake -> this.chessBoard.setSquare(possibleTake.getX(), possibleTake.getY(), Block.RED_CONCRETE));
+        this.illegalMoves.forEach(illegalMove -> this.chessBoard.setSquare(illegalMove.getX(), illegalMove.getY(), Block.ORANGE_CONCRETE));
     }
 
     public PiecePosition getPosition() {
@@ -91,8 +85,8 @@ public abstract class ChessPiece {
         return this.isWhite;
     }
 
-    public boolean hasMoved() {
-        return this.hasMoved;
+    public boolean hasNotMoved() {
+        return !this.hasMoved;
     }
 
     public void select() {
@@ -103,26 +97,386 @@ public abstract class ChessPiece {
         this.chessBoard.unselectPiece();
     }
 
-    protected void addPossibleMoves(PiecePosition possibleMove) {
-        this.possibleMoves.add(possibleMove);
-    }
-
-    protected void clearPossibleMoves() {
-        this.possibleMoves = new ArrayList<>();
-    }
-
-    protected void checkAndAddPossibleTakes(PiecePosition possibleMove) {
-        if (this.chessBoard.getChessGame().getPiece(possibleMove).isPresent()) {
-            ChessPiece piece = this.chessBoard.getChessGame().getPiece(possibleMove).get();
-            if (this.isWhite != piece.isWhite) {
-                this.possibleTake.add(possibleMove);
-            }
+    protected void checkAndAddPossibleMoves(PiecePosition possibleMove) {
+        if (isLegal(possibleMove)) {
+            this.possibleMoves.add(possibleMove);
+        } else {
+            this.illegalMoves.add(possibleMove);
         }
     }
 
-    protected void clearPossibleTakes() {
-        this.possibleTake = new ArrayList<>();
+    protected void clearMoves() {
+        this.possibleMoves = new ArrayList<>();
+        this.illegalMoves = new ArrayList<>();
+        this.possibleTakes = new ArrayList<>();
     }
 
+    protected void checkAndAddPossibleTakes(PiecePosition possibleMove) {
+
+        if (this.chessBoard.getChessGame().getPiece(possibleMove).isPresent()) {
+            ChessPiece piece = this.chessBoard.getChessGame().getPiece(possibleMove).get();
+            if (this.isWhite != piece.isWhite) {
+                if (isLegal(possibleMove)) {
+                    this.possibleTakes.add(possibleMove);
+                } else {
+                    this.illegalMoves.add(possibleMove);
+                }
+            }
+        }
+
+    }
+
+    public List<PiecePosition> getPossibleTakes() {
+        return this.possibleTakes;
+    }
+
+    public void take(PiecePosition pos) {
+        ChessPiece chessPiece;
+        if (this.chessBoard.getChessGame().getPiece(pos).isPresent()) {
+            chessPiece = this.chessBoard.getChessGame().getPiece(pos).get();
+        } else {
+            return;
+        }
+
+        this.chessBoard.killPiece(chessPiece);
+        this.move(pos);
+    }
+
+    public PiecePosition getTestPosition() {
+        return this.testPosition;
+    }
+
+    private boolean isLegal(PiecePosition position) {
+        King king = this.isWhite ? this.chessBoard.getWhiteKing() : this.chessBoard.getBlackKing();
+
+        this.testPosition.set(position);
+
+        // Check Pawns
+        PiecePosition testPos = new PiecePosition(0, 0);
+        if (this.isWhite) {
+            testPos.set(king.getTestPosition());
+            testPos.incX();
+            testPos.incY();
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Pawn && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                }
+            }
+            testPos.set(king.getTestPosition());
+            testPos.decX();
+            testPos.incY();
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Pawn && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                }
+            }
+        } else {
+            testPos.set(king.getTestPosition());
+            testPos.incX();
+            testPos.decY();
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Pawn && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                }
+            }
+            testPos.set(king.getTestPosition());
+            testPos.decX();
+            testPos.decY();
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Pawn && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                }
+            }
+        }
+
+        // Check King
+        testPos.set(king.getTestPosition());
+        testPos.incX();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof King && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.incY();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof King && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.decX();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof King && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.decY();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof King && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.decX();
+        testPos.decY();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof King && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.incX();
+        testPos.decY();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof King && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.decX();
+        testPos.incY();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof King && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.incX();
+        testPos.incY();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof King && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+
+        // Check Knights
+        testPos.set(king.getTestPosition());
+        testPos.incX();
+        testPos.incX();
+        testPos.incY();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Knight && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.incX();
+        testPos.incX();
+        testPos.decY();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Knight && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.decX();
+        testPos.decX();
+        testPos.incY();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Knight && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.decX();
+        testPos.decX();
+        testPos.decY();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Knight && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+
+        testPos.set(king.getTestPosition());
+        testPos.incY();
+        testPos.incY();
+        testPos.incX();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Knight && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.incY();
+        testPos.incY();
+        testPos.decX();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Knight && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.decY();
+        testPos.decY();
+        testPos.incX();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Knight && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+        testPos.set(king.getTestPosition());
+        testPos.decY();
+        testPos.decY();
+        testPos.decY();
+        if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+            if (this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Knight && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                this.testPosition.set(this.position);
+                return false;
+            }
+        }
+
+        // Check Bishop / Queen
+        testPos.set(king.getTestPosition());
+        while (true) {
+            testPos.incX();
+            testPos.incY();
+            if (!this.chessBoard.isValidSquare(testPos)) {
+                break;
+            }
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if ((this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Queen || this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Bishop) && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                } else {
+                    break;
+                }
+            }
+        }
+        testPos.set(king.getTestPosition());
+        while (true) {
+            testPos.decX();
+            testPos.incY();
+            if (!this.chessBoard.isValidSquare(testPos)) {
+                break;
+            }
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if ((this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Queen || this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Bishop) && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                } else {
+                    break;
+                }
+            }
+        }
+        testPos.set(king.getTestPosition());
+        while (true) {
+            testPos.incX();
+            testPos.decY();
+            if (!this.chessBoard.isValidSquare(testPos)) {
+                break;
+            }
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if ((this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Queen || this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Bishop) && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                } else {
+                    break;
+                }
+            }
+        }
+        testPos.set(king.getTestPosition());
+        while (true) {
+            testPos.decX();
+            testPos.decY();
+            if (!this.chessBoard.isValidSquare(testPos)) {
+                break;
+            }
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if ((this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Queen || this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Bishop) && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // Check Rook / Queen
+
+        testPos.set(king.getTestPosition());
+        while (true) {
+            testPos.incX();
+            if (!this.chessBoard.isValidSquare(testPos)) {
+                break;
+            }
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if ((this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Queen || this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Rook) && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                } else {
+                    break;
+                }
+            }
+        }
+        testPos.set(king.getTestPosition());
+        while (true) {
+            testPos.decX();
+            if (!this.chessBoard.isValidSquare(testPos)) {
+                break;
+            }
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if ((this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Queen || this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Rook) && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                } else {
+                    break;
+                }
+            }
+        }
+        testPos.set(king.getTestPosition());
+        while (true) {
+            testPos.incY();
+            if (!this.chessBoard.isValidSquare(testPos)) {
+                break;
+            }
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if ((this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Queen || this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Rook) && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                } else {
+                    break;
+                }
+            }
+        }
+        testPos.set(king.getTestPosition());
+        while (true) {
+            testPos.decY();
+            if (!this.chessBoard.isValidSquare(testPos)) {
+                break;
+            }
+            if (this.chessBoard.getChessGame().getPiece(testPos).isPresent()) {
+                if ((this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Queen || this.chessBoard.getChessGame().getPiece(testPos).get() instanceof Rook) && (this.chessBoard.getChessGame().getPiece(testPos).get().getIsWhite()) != this.getIsWhite()) {
+                    this.testPosition.set(this.position);
+                    return false;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        this.testPosition.set(this.position);
+        return true;
+    }
 }
 

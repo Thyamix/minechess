@@ -14,20 +14,29 @@ public class Pawn extends ChessPiece {
 
     @Override
     public void getMoves() {
-        this.clearPossibleMoves();
-        this.clearPossibleTakes();
+        this.clearMoves();
         PiecePosition possibleMove = this.getPosition().clone();
         possibleMove.setY(this.getIsWhite() ? (possibleMove.getY() + 1) : (possibleMove.getY() - 1));
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
-            this.addPossibleMoves(possibleMove.clone());
-        } else {
-            return;
+            this.checkAndAddPossibleMoves(possibleMove.clone());
         }
-        if (!this.hasMoved()) {
+        if (this.hasNotMoved()) {
             possibleMove.setY(this.getIsWhite() ? possibleMove.getY() + 1 : possibleMove.getY() - 1);
-            if (this.chessBoard.isEmptyValidSquare(possibleMove) && !this.hasMoved()) {
-                this.addPossibleMoves(possibleMove.clone());
+            if (this.chessBoard.isEmptyValidSquare(possibleMove) && this.hasNotMoved()) {
+                this.checkAndAddPossibleMoves(possibleMove.clone());
             }
+        }
+
+        possibleMove = this.getPosition().clone();
+        possibleMove.setY(this.getIsWhite() ? (possibleMove.getY() + 1) : (possibleMove.getY() - 1));
+        possibleMove.decX();
+        if (this.chessBoard.isValidSquare(possibleMove)) {
+            this.checkAndAddPossibleTakes(possibleMove.clone());
+        }
+        possibleMove.incX();
+        possibleMove.incX();
+        if (this.chessBoard.isValidSquare(possibleMove)) {
+            this.checkAndAddPossibleTakes(possibleMove.clone());
         }
     }
 }

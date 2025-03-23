@@ -97,6 +97,17 @@ public class ChessGame {
                         piece.move(pos);
                         return;
                     }
+                } else if (this.chessBoard.getSelectedPiece().getPossibleTakes().stream().anyMatch(piecePosition -> {
+                    return piecePosition.equals(pos);
+                })) {
+                    ChessPiece  piece = this.chessBoard.getSelectedPiece();
+                    if (playerUseItemEvent.getPlayer().equals(player1) && piece.getIsWhite() && isWhiteTurn) {
+                        piece.take(pos);
+                        return;
+                    } else if (playerUseItemEvent.getPlayer().equals(player2) && !piece.getIsWhite() && !isWhiteTurn) {
+                        piece.take(pos);
+                        return;
+                    }
                 }
             }
         });
@@ -104,6 +115,7 @@ public class ChessGame {
     }
 
     public Optional<ChessPiece> getPiece(PiecePosition pos) {
-        return this.chessBoard.getChessPieces().stream().filter(chessPiece -> chessPiece.getPosition().equals(pos)).findAny();
+        return this.chessBoard.getChessPieces().stream().filter(chessPiece -> chessPiece.getTestPosition().equals(pos)).findAny();
     }
+
 }

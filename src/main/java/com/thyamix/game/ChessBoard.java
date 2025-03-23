@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChessBoard {
-    private List<ChessPiece> chessPieces = new ArrayList<>();
+    private final List<ChessPiece> chessPieces = new ArrayList<>();
+    private final List<ChessPiece> kings = new ArrayList<>();
     private final ChessGame chessGame;
     private ChessPiece selectedPiece;
+    private King blackKing;
+    private King whiteKing;
 
     public ChessBoard(ChessGame chessGame) {
         this.chessGame = chessGame;
@@ -45,7 +48,8 @@ public class ChessBoard {
         // White Queen
         this.chessPieces.add(new Queen(new SchematicReader(), this, true, new PiecePosition(4, 0)));
         // White King
-        this.chessPieces.add(new King(new SchematicReader(), this, true, new PiecePosition(3, 0)));
+        this.whiteKing = new King(new SchematicReader(), this, true, new PiecePosition(3, 0));
+        this.chessPieces.add(this.whiteKing);
 
         // Black Pawns
         for (int x = 0; x < 8; x++) {
@@ -63,7 +67,8 @@ public class ChessBoard {
         // Black Queen
         this.chessPieces.add(new Queen(new SchematicReader(), this, false, new PiecePosition(4, 7)));
         // Black King
-        this.chessPieces.add(new King(new SchematicReader(), this, false, new PiecePosition(3, 7)));
+        this.blackKing = new King(new SchematicReader(), this, false, new PiecePosition(3, 7));
+        this.chessPieces.add(this.blackKing);
     }
 
     public boolean isEmptyValidSquare(PiecePosition position) {
@@ -126,5 +131,18 @@ public class ChessBoard {
     public void unselectPiece() {
         this.selectedPiece = null;
         this.resetBoard();
+    }
+
+    public void killPiece(ChessPiece chessPiece) {
+        this.chessPieces.remove(chessPiece);
+        chessPiece.clearBlocks();
+    }
+
+    public King getBlackKing() {
+        return this.blackKing;
+    }
+
+    public King getWhiteKing() {
+        return this.whiteKing;
     }
 }
