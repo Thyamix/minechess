@@ -21,14 +21,14 @@ public class Knight extends  ChessPiece{
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
         possibleMove.decY();
         possibleMove.decY();
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
 
         possibleMove = this.getPosition().clone();
@@ -38,14 +38,14 @@ public class Knight extends  ChessPiece{
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
         possibleMove.decY();
         possibleMove.decY();
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
 
         possibleMove = this.getPosition().clone();
@@ -55,14 +55,14 @@ public class Knight extends  ChessPiece{
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
         possibleMove.decX();
         possibleMove.decX();
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
 
         possibleMove = this.getPosition().clone();
@@ -72,14 +72,14 @@ public class Knight extends  ChessPiece{
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
         possibleMove.decX();
         possibleMove.decX();
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
     }
 }

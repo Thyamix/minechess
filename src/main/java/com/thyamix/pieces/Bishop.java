@@ -22,7 +22,7 @@ public class Bishop extends ChessPiece {
                 this.checkAndAddPossibleMoves(possibleMove.clone());
             } else {
                 if (this.chessBoard.isValidSquare(possibleMove)) {
-                    this.checkAndAddPossibleTakes(possibleMove.clone());
+                    this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
                 }
                 break;
             }
@@ -35,7 +35,7 @@ public class Bishop extends ChessPiece {
                 this.checkAndAddPossibleMoves(possibleMove.clone());
             } else {
                 if (this.chessBoard.isValidSquare(possibleMove)) {
-                    this.checkAndAddPossibleTakes(possibleMove.clone());
+                    this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
                 }
                 break;
             }
@@ -48,7 +48,7 @@ public class Bishop extends ChessPiece {
                 this.checkAndAddPossibleMoves(possibleMove.clone());
             } else {
                 if (this.chessBoard.isValidSquare(possibleMove)) {
-                    this.checkAndAddPossibleTakes(possibleMove.clone());
+                    this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
                 }
                 break;
             }
@@ -61,7 +61,7 @@ public class Bishop extends ChessPiece {
                 this.checkAndAddPossibleMoves(possibleMove.clone());
             } else {
                 if (this.chessBoard.isValidSquare(possibleMove)) {
-                    this.checkAndAddPossibleTakes(possibleMove.clone());
+                    this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
                 }
                 break;
             }

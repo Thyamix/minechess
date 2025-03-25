@@ -20,7 +20,7 @@ public class King extends ChessPiece{
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             this.checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
         possibleMove.set(this.getPosition());
         possibleMove.incY();
@@ -28,7 +28,7 @@ public class King extends ChessPiece{
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             this.checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
         possibleMove.set(this.getPosition());
         possibleMove.decY();
@@ -36,7 +36,7 @@ public class King extends ChessPiece{
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             this.checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
         possibleMove.set(this.getPosition());
         possibleMove.decY();
@@ -44,21 +44,21 @@ public class King extends ChessPiece{
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             this.checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
         possibleMove.set(this.getPosition());
         possibleMove.incX();
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             this.checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
         possibleMove.set(this.getPosition());
         possibleMove.decX();
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             this.checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
         possibleMove.set(this.getPosition());
         possibleMove.incY();
@@ -66,14 +66,14 @@ public class King extends ChessPiece{
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             this.checkAndAddPossibleMoves(possibleMove.clone());
         } else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
         possibleMove.set(this.getPosition());
         possibleMove.decY();
         if (this.chessBoard.isEmptyValidSquare(possibleMove)) {
             this.checkAndAddPossibleMoves(possibleMove.clone());
         }  else if (this.chessBoard.isValidSquare(possibleMove)) {
-            this.checkAndAddPossibleTakes(possibleMove.clone());
+            this.checkAndAddPossibleTakes(possibleMove.clone(), possibleMove.clone());
         }
     }
 }

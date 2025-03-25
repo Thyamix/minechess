@@ -22,7 +22,7 @@ public abstract class ChessPiece {
     private final boolean isWhite;
     private List<PiecePosition> possibleMoves = new ArrayList<>();
     private List<PiecePosition> illegalMoves = new ArrayList<>();
-    private List<PiecePosition> possibleTakes = new ArrayList<>();
+    private List<PiecePosition[]> possibleTakes = new ArrayList<>();
 
     ChessPiece(Schematic schematic, ChessBoard chessBoard, boolean isWhite, PiecePosition position) {
         this.schematic = schematic;
@@ -38,6 +38,8 @@ public abstract class ChessPiece {
 
     public void move(PiecePosition move) {
         clearBlocks();
+
+        this.chessBoard.getChessGame().addMove(this, this.position.clone(), move.clone());
 
         this.position.set(move);
         this.testPosition.set(move);
@@ -69,7 +71,7 @@ public abstract class ChessPiece {
 
     public void displayPossibleMoves() {
         this.possibleMoves.forEach(possibleMove -> this.chessBoard.setSquare(possibleMove.getX(), possibleMove.getY(), Block.GREEN_CONCRETE));
-        this.possibleTakes.forEach(possibleTake -> this.chessBoard.setSquare(possibleTake.getX(), possibleTake.getY(), Block.RED_CONCRETE));
+        this.possibleTakes.forEach(possibleTake -> this.chessBoard.setSquare(possibleTake[1].getX(), possibleTake[1].getY(), Block.RED_CONCRETE));
         this.illegalMoves.forEach(illegalMove -> this.chessBoard.setSquare(illegalMove.getX(), illegalMove.getY(), Block.ORANGE_CONCRETE));
     }
 
@@ -111,35 +113,33 @@ public abstract class ChessPiece {
         this.possibleTakes = new ArrayList<>();
     }
 
-    protected void checkAndAddPossibleTakes(PiecePosition possibleMove) {
-
-        if (this.chessBoard.getChessGame().getPiece(possibleMove).isPresent()) {
-            ChessPiece piece = this.chessBoard.getChessGame().getPiece(possibleMove).get();
-            if (this.isWhite != piece.isWhite) {
+    protected void checkAndAddPossibleTakes(PiecePosition possibleTake ,PiecePosition possibleMove) {
+        if (this.chessBoard.getChessGame().getPiece(possibleTake).isPresent()) {
+            if (this.isWhite != this.chessBoard.getChessGame().getPiece(possibleTake).get().isWhite) {
                 if (isLegal(possibleMove)) {
-                    this.possibleTakes.add(possibleMove);
+                    this.possibleTakes.add(new PiecePosition[]{possibleTake, possibleMove});
                 } else {
                     this.illegalMoves.add(possibleMove);
                 }
             }
         }
-
     }
 
-    public List<PiecePosition> getPossibleTakes() {
+    public List<PiecePosition[]> getPossibleTakes() {
         return this.possibleTakes;
     }
 
-    public void take(PiecePosition pos) {
+    public void take(PiecePosition[] take) {
         ChessPiece chessPiece;
-        if (this.chessBoard.getChessGame().getPiece(pos).isPresent()) {
-            chessPiece = this.chessBoard.getChessGame().getPiece(pos).get();
+        if (this.chessBoard.getChessGame().getPiece(take[0]).isPresent()) {
+            chessPiece = this.chessBoard.getChessGame().getPiece(take[0]).get();
         } else {
             return;
         }
 
         this.chessBoard.killPiece(chessPiece);
-        this.move(pos);
+
+        this.move(take[1]);
     }
 
     public PiecePosition getTestPosition() {

@@ -1,6 +1,7 @@
 package com.thyamix.game;
 
 import com.thyamix.pieces.ChessPiece;
+import com.thyamix.utility.PieceMove;
 import com.thyamix.utility.PiecePosition;
 import com.thyamix.utility.RayTraceGridSelector;
 import net.kyori.adventure.text.Component;
@@ -13,6 +14,8 @@ import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class ChessGame {
@@ -21,6 +24,7 @@ public class ChessGame {
     private final ChessBoard chessBoard;
     public Player player1;
     public Player player2;
+    private final List<PieceMove> moves = new ArrayList<>();
     private boolean isWhiteTurn = true;
     public boolean running;
     public boolean complete;
@@ -98,14 +102,17 @@ public class ChessGame {
                         return;
                     }
                 } else if (this.chessBoard.getSelectedPiece().getPossibleTakes().stream().anyMatch(piecePosition -> {
-                    return piecePosition.equals(pos);
+                    return piecePosition[1].equals(pos);
                 })) {
                     ChessPiece  piece = this.chessBoard.getSelectedPiece();
+                    PiecePosition[] take = this.chessBoard.getSelectedPiece().getPossibleTakes().stream().filter(possibleTakes -> {
+                            return possibleTakes[1].equals(pos);
+                    }).findFirst().get();
                     if (playerUseItemEvent.getPlayer().equals(player1) && piece.getIsWhite() && isWhiteTurn) {
-                        piece.take(pos);
+                        piece.take(take);
                         return;
                     } else if (playerUseItemEvent.getPlayer().equals(player2) && !piece.getIsWhite() && !isWhiteTurn) {
-                        piece.take(pos);
+                        piece.take(take);
                         return;
                     }
                 }
@@ -118,4 +125,12 @@ public class ChessGame {
         return this.chessBoard.getChessPieces().stream().filter(chessPiece -> chessPiece.getTestPosition().equals(pos)).findAny();
     }
 
+    public void addMove(ChessPiece piece ,PiecePosition position, PiecePosition move) {
+        this.moves.add(new PieceMove(piece, position, move));
+        this.isWhiteTurn = !this.isWhiteTurn;
+    }
+
+    public PieceMove getLastMove() {
+        return moves.getLast();
+    }
 }
