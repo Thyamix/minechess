@@ -1,6 +1,6 @@
 # MineChess
 
-⚠️ **Warning:** This project is not currently being worked on.  
+⚠️ **Warning:** This project is incomplete.  
 
 A chess game built in Java using the [Minestom](https://github.com/Minestom/Minestom) framework.  
 The core functionality works, but some move validation rules (especially discovered attacks) still need refinement.  
